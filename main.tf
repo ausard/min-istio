@@ -23,3 +23,7 @@ module "k8s-mesh" {
   source = "./modules/k8s-mesh"
    aws_auth_config_map_id = "Hello" # Dependency on aws_auth configmap
 }
+module "k8s-monitor" {
+  source = "./modules/k8s-monitor"
+  aws_auth_config_map_id = "Hello" # Dependency on aws_auth configmap
+}

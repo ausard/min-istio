@@ -1,0 +1,282 @@
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+---
+global:
+  rbac:
+    create: true
+    pspEnabled: false
+nodeExporter:
+  enabled: true
+kubeDns:
+  enabled: true
+prometheus-node-exporter:
+  podLabels:
+    app: prometheus-node-exporter
+    context: v1
+    scope: platform
+    owner: enable-gds
+    team: enable
+    department: global-digital
+#---------------Prometheus-------------------
+prometheus:
+  service:
+    labels:
+      app: prometheus
+      context: v1
+      scope: platform
+      owner: enable-gds
+      team: enable
+      department: global-digital
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}    
+    podMetadata:
+      labels:
+        app: prometheus
+        context: v1
+        scope: platform
+        owner: enable-gds
+        team: enable
+        department: global-digital
+    # storageSpec:
+    #   volumeClaimTemplate:
+    #     spec:
+    #       # storageClassName: gp2
+    #       accessModes: ["ReadWriteOnce"]
+    #       resources:
+    #         requests:
+    #           storage: 10Gi
+#-------------scrape_configs---------------
+    additionalScrapeConfigs:
+    #-----------kubecost-----------------
+    - job_name: kubecost
+      honor_labels: true
+      scrape_interval: 1m
+      scrape_timeout: 10s
+      metrics_path: /metrics
+      scheme: http
+      dns_sd_configs:
+      - names:
+        - kubecost-cost-analyzer.kubecost
+        type: 'A'
+        port: 9003
+    - job_name: kubecost-networking
+      kubernetes_sd_configs:
+        - role: pod
+      relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_label_app]
+          action: keep
+          regex: kubecost-network-costs
+    #-----------ambassador---------------
+    - job_name: ambassador-internal
+      scrape_interval: 15s
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+        action: keep
+        regex: ambassador;ambassador-internal-admin;ambassador-admin
+    - job_name: ambassador-external
+      scrape_interval: 15s
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+        action: keep
+        regex: ambassador;ambassador-external-admin;ambassador-admin
+    #--------external-secrets------------
+    - job_name: external-secrets
+      scrape_interval: 15s
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+        action: keep
+        regex: external-secrets;external-secrets-kubernetes-external-secrets;prometheus
+    #-----------Istio-----------it only for 1.4.3-----for version > 1.6. will be overriden ----
+    - job_name: 'istio-mesh'
+      scrape_interval: 5s
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+        action: keep
+        regex: istio-system;istio-telemetry;prometheus
+    - job_name: 'pilot'
+      scrape_interval: 5s
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+        action: keep
+        regex: istio-system;istio-pilot;http-monitoring
+    - job_name: 'mixer'
+      scrape_interval: 5s
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+        action: keep
+        regex: istio-system;istio-telemetry;http-monitoring
+    - job_name: 'galley'
+      scrape_interval: 5s
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+        action: keep
+        regex: istio-system;istio-galley;http-monitoring
+    - job_name: 'injector'
+      scrape_interval: 5s
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+        action: keep
+        regex: istio-system;istio-sidecar-injector;http-monitoring
+    - job_name: 'citadel'
+      scrape_interval: 5s
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+        action: keep
+        regex: istio-system;istio-citadel;http-monitoring
+#---------------------Grafana---------------------
+grafana:
+  deploymentStrategy:
+    type: RollingUpdate    
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+      - name: 'istio'
+        orgId: 1
+        folder: 'Istio'
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/istio
+      - name: 'jvm'
+        orgId: 1
+        folder: 'JVM'
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/jvm
+      - name: 'k8s'
+        orgId: 1
+        folder: 'K8s'
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/k8s
+ 
+  dashboards: 
+    default:      
+      ambassador-dasboard:
+        gnetId: 10850
+        revision: 2
+        datasource: Prometheus
+    k8s:
+      node-exporter:
+        gnetId: 1860
+        revision: 21
+        datasource: Prometheus
+      kubernetes-monitoring:
+        gnetId: 7249
+        revision: 1
+        datasource: Prometheus
+      kubernetes-monitoring-prom:
+        gnetId: 12206
+        revision: 1
+        datasource: Prometheus
+    istio:
+      istio-control-pane:
+        gnetId: 7645
+        revision: 47
+        datasource: Prometheus
+      istio-workload:
+        gnetId: 7630
+        revision: 47
+        datasource: Prometheus
+      istio-service:
+        gnetId: 7636
+        revision: 47
+        datasource: Prometheus
+      istio-mesh:
+        gnetId: 7639
+        revision: 47
+        datasource: Prometheus
+    jvm:     
+      spring-boot-statistic:
+        url: ${SPRING_DASHBOARD_LINK}
+
+  adminPassword: "${ADMIN_PWD}"
+  replicas: ${GRAFANA_REPLICA}
+  podDisruptionBudget:
+    maxUnavailable: ${GRAFANA_REPLICA}
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  nodeSelector:
+    worker-class: private
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+    datasources:
+      enabled: true
+      searchNamespace: ALL
+  grafana.ini:
+    auth.anonymous:
+      enabled: true
+    server:
+      root_url: "${ROOT_URL}"
+  plugins:
+    - grafana-clock-panel
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: default-kubecost
+        type: prometheus
+        url: http://kube-prometheus-stack-prometheus:9090
+        access: proxy
+        isDefault: false
+  service:
+    labels:
+      app: grafana
+      context: v1
+      scope: platform
+      owner: enable-gds
+      team: enable
+      department: global-digital
+  labels:
+    app: grafana
+    context: v1
+    scope: platform
+    owner: enable-gds
+    team: enable
+    department: global-digital
+  podLabels:
+    app: grafana
+    context: v1
+    scope: platform
+    owner: enable-gds
+    team: enable
+    department: global-digital

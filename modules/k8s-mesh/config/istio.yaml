@@ -24,7 +24,7 @@ global:
   defaultPodDisruptionBudget:
     enabled: true
 galley:
-  replicaCount: 2
+  replicaCount: 1
   nodeSelector:
     worker-class: private
   podAntiAffinityLabelSelector:
@@ -34,27 +34,27 @@ galley:
       topologyKey: kubernetes.io/hostname
 mixer:
   telemetry:
-    enabled: true
-    replicaCount: 2
+    enabled: false
+    replicaCount: 1
     autoscaleEnabled: true
-    autoscaleMin: 2
+    autoscaleMin: 1
     autoscaleMax: 4
   policy:
     enabled: true
-    replicaCount: 2
+    replicaCount: 1
     autoscaleEnabled: true
-    autoscaleMin: 2
+    autoscaleMin: 1
     autoscaleMax: 4
   nodeSelector:
     worker-class: private
-  podAntiAffinityLabelSelector:
-    - key: istio
-      operator: In
-      values: mixer
-      topologyKey: kubernetes.io/hostname
+  # podAntiAffinityLabelSelector:
+  #   - key: istio
+  #     operator: In
+  #     values: mixer
+  #     topologyKey: kubernetes.io/hostname
 pilot:
   enabled: true
-  autoscaleMin: 2
+  autoscaleMin: 1
   autoscaleMax: 4
   nodeSelector:
     worker-class: private
@@ -65,7 +65,7 @@ pilot:
       topologyKey: kubernetes.io/hostname
 security:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
   nodeSelector:
     worker-class: private
   podAntiAffinityLabelSelector:
@@ -75,7 +75,7 @@ security:
       topologyKey: kubernetes.io/hostname
 sidecarInjectorWebhook:
   enabled: true
-  replicaCount: 2
+  replicaCount: 1
   enableNamespacesByDefault: true
   nodeSelector:
     worker-class: private
@@ -88,11 +88,9 @@ gateways:
   enabled: false
   istio-ingressgateway:
     enabled: false
-    sds:
-      enabled: false
   istio-egressgateway:
     enabled: true
-    autoscaleMin: 2
+    autoscaleMin: 1
     autoscaleMax: 4
     nodeSelector:
       worker-class: private-edge
@@ -113,18 +111,18 @@ gateways:
         name: mysql
 grafana:
   enabled: false
-  replicaCount: 2
-  security:
-    enabled: true
-  env:
-    GF_SERVER_ROOT_URL: "/grafana/"
-  nodeSelector:
-    worker-class: private
-  podAntiAffinityLabelSelector:
-    - key: app
-      operator: In
-      values: grafana
-      topologyKey: kubernetes.io/hostname
+  # replicaCount: 1
+  # security:
+  #   enabled: true
+  # env:
+  #   GF_SERVER_ROOT_URL: "/grafana/"
+  # nodeSelector:
+  #   worker-class: private
+  # podAntiAffinityLabelSelector:
+  #   - key: app
+  #     operator: In
+  #     values: grafana
+  #     topologyKey: kubernetes.io/hostname
 kiali:
   enabled: true
   replicaCount: 1
@@ -135,5 +133,7 @@ kiali:
       operator: In
       values: kiali
       topologyKey: kubernetes.io/hostname
+  
+  # pronetheusAddr: http://kube-prometheus-stack.kube-prometheus-stack-prometheus:9090
 prometheus:
-  enabled: false
+  enabled: true

@@ -1,1 +1,1 @@
-{"Modules":[{"Key":"k8s-mesh","Source":"./modules/k8s-mesh","Dir":"modules/k8s-mesh"},{"Key":"","Source":"","Dir":"."}]}
+{"Modules":[{"Key":"","Source":"","Dir":"."},{"Key":"k8s-mesh","Source":"./modules/k8s-mesh","Dir":"modules/k8s-mesh"},{"Key":"k8s-monitor","Source":"./modules/k8s-monitor","Dir":"modules/k8s-monitor"}]}

@@ -1,0 +1,136 @@
+---
+global:
+  logging:
+    level: "default:info"
+  proxy:
+    logLevel: info
+    accessLogFile: "/dev/stdout"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    init:
+      requests:
+        cpu: 10m
+        memory: 10Mi
+      limit:
+        cpu: 100m
+        memory: 50Mi
+  outboundTrafficPolicy:
+    mode: REGISTRY_ONLY
+  defaultPodDisruptionBudget:
+    enabled: true
+galley:
+  replicaCount: 2
+  nodeSelector:
+    worker-class: private
+  podAntiAffinityLabelSelector:
+    - key: istio
+      operator: In
+      values: galley
+      topologyKey: kubernetes.io/hostname
+mixer:
+  telemetry:
+    enabled: true
+    replicaCount: 2
+    autoscaleEnabled: true
+    autoscaleMin: 2
+    autoscaleMax: 4
+  policy:
+    enabled: true
+    replicaCount: 2
+    autoscaleEnabled: true
+    autoscaleMin: 2
+    autoscaleMax: 4
+  nodeSelector:
+    worker-class: private
+  podAntiAffinityLabelSelector:
+    - key: istio
+      operator: In
+      values: mixer
+      topologyKey: kubernetes.io/hostname
+pilot:
+  enabled: true
+  autoscaleMin: 2
+  autoscaleMax: 4
+  nodeSelector:
+    worker-class: private
+  podAntiAffinityLabelSelector:
+    - key: istio
+      operator: In
+      values: pilot
+      topologyKey: kubernetes.io/hostname
+security:
+  enabled: true
+  replicaCount: 2
+  nodeSelector:
+    worker-class: private
+  podAntiAffinityLabelSelector:
+    - key: istio
+      operator: In
+      values: citadel
+      topologyKey: kubernetes.io/hostname
+sidecarInjectorWebhook:
+  enabled: true
+  replicaCount: 2
+  enableNamespacesByDefault: true
+  nodeSelector:
+    worker-class: private
+  podAntiAffinityLabelSelector:
+    - key: istio
+      operator: In
+      values: sidecar-injector
+      topologyKey: kubernetes.io/hostname
+gateways:
+  istio-ingressgateway:
+    enabled: false
+  istio-egressgateway:
+    enabled: true
+    autoscaleMin: 2
+    autoscaleMax: 4
+    nodeSelector:
+      worker-class: private-edge
+    podAntiAffinityLabelSelector:
+      - key: istio
+        operator: In
+        values: egressgateway
+        topologyKey: kubernetes.io/hostname
+    ports:
+      - port: 80
+        name: http2
+      - port: 443
+        name: https
+      - port: 15443
+        targetPort: 15443
+        name: tls
+      - port: 3306
+        name: mysql
+grafana:
+  enabled: false
+  replicaCount: 2
+  security:
+    enabled: true
+  env:
+    GF_SERVER_ROOT_URL: "/grafana/"
+  nodeSelector:
+    worker-class: private
+  podAntiAffinityLabelSelector:
+    - key: app
+      operator: In
+      values: grafana
+      topologyKey: kubernetes.io/hostname
+kiali:
+  enabled: true
+  replicaCount: 2
+  nodeSelector:
+    worker-class: private
+  podAntiAffinityLabelSelector:
+    - key: app
+      operator: In
+      values: kiali
+      topologyKey: kubernetes.io/hostname
+prometheus:
+  enabled: false

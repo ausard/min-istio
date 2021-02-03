@@ -1,111 +1,145 @@
-# Ref: https://github.com/istio/istio/blob/master/install/kubernetes/helm/istio/values.yaml
-# Ref: https://istio.io/docs/reference/config/installation-options/
-# Ref: https://github.com/istio/istio/tree/1.4.3/install/kubernetes/helm/istio
-# Ref: https://github.com/istio/istio/tree/1.4.3
+# ###################Install Istio (Service Mesh) #######################################
+# resource "kubernetes_namespace" "istio_system" {
+#   metadata {
+#     name = "istio-system"
+#   }
+# }
 
-# Istio namespace with Istio injection disabled so no sidecars are created for pods in this namespace
+# resource "kubernetes_secret" "grafana" {
+
+#   metadata {
+#     name      = "grafana"
+#     namespace = "istio-system"
+#     labels = {
+#       app = "grafana"
+#     }
+#   }
+#   data = {
+#     username   = "admin"
+#     passphrase = "admin"
+#   }
+#   type       = "Opaque"
+#   depends_on = [kubernetes_namespace.istio_system]
+# }
+
+# resource "kubernetes_secret" "kiali" {
+
+#   metadata {
+#     name      = "kiali"
+#     namespace = "istio-system"
+#     labels = {
+#       app = "kiali"
+#     }
+#   }
+#   data = {
+#     username   = "admin"
+#     passphrase = "admin"
+#   }
+#   type       = "Opaque"
+#   depends_on = [kubernetes_namespace.istio_system]
+# }
+
+# resource "local_file" "istio-config" {
+#   content = templatefile("${path.module}/template/istio-eks.tmpl", {
+#     enableGrafana = true
+#     enableKiali   = true
+#     enableTracing = true
+#   })
+#   filename = ".istio/istio-eks.yaml"
+# }
+
+# resource "null_resource" "istio" {
+#   triggers = {
+#     always_run = "${timestamp()}"
+#   }
+#   provisioner "local-exec" {
+#     command = "kubectl apply -f \".istio/istio-eks.yaml\""
+#   }
+#   depends_on = [kubernetes_secret.grafana, kubernetes_secret.kiali, local_file.istio-config]
+# }
+
+
+# ################### Deploy booking info sample application with gateway  #######################################
+
+# // kubectl provider can be installed from here - https://gavinbunney.github.io/terraform-provider-kubectl/docs/provider.html 
+# # data "kubectl_filename_list" "manifests" {
+# #     pattern = "samples/bookinfo/*.yaml"
+# # }
+
+# # // source of booking info application - https://istio.io/latest/docs/examples/bookinfo/
+
+# # resource "kubectl_manifest" "bookinginfo" {
+# #     count = length(data.kubectl_filename_list.manifests.matches)
+# #     yaml_body = file(element(data.kubectl_filename_list.manifests.matches, count.index))
+# # }
 resource "kubernetes_namespace" "istio_namespace" {
   metadata {
-    name = "istio-system"
+    name     = "istio-system"
 
     labels = {
-      app             = "istio"
-      context         = "v1"
-      owner           = "gds"
-      team            = "enable"
-      scope           = "platform"
-      department      = "global-digital"
+      app = "istio"
+      context = "v1"
+      owner = "gds"
+      team = "enable"
+      scope = "platform"
+      department = "global-digital"
       istio-injection = "disabled"
     }
 
-    annotations = {
-      "cattle.io/status"                          = "placeholder"
-      "lifecycle.cattle.io/create.namespace-auth" = "placeholder"
-    }
+    # annotations = {
+    #   "cattle.io/status" = "placeholder"
+    #   "lifecycle.cattle.io/create.namespace-auth" = "placeholder"
+    # }
   }
 
-  lifecycle {
-    ignore_changes = [
-      metadata[0].annotations["cattle.io/status"],
-      metadata[0].annotations["lifecycle.cattle.io/create.namespace-auth"]
-    ]
-  }
-
-  depends_on = [
-    var.aws_auth_config_map_id,
-  ]
+  # lifecycle {
+  #   ignore_changes = [
+  #     metadata[0].annotations["cattle.io/status"],
+  #     metadata[0].annotations["lifecycle.cattle.io/create.namespace-auth"]
+  #   ]
+  # }
 }
+# resource "helm_release" "istio_base" {
+#   name       = "istio-base"
+#   chart      = "${path.module}/charts/base/"
+#   version    = "1.0.0"
+#   namespace  = kubernetes_namespace.istio_namespace.metadata.0.name
+#   dependency_update = true
 
-# Kiali kubernetes secret for basic authentication
-resource "kubernetes_secret" "kiali_secret" {
-  metadata {
-    name      = "kiali"
-    namespace = kubernetes_namespace.istio_namespace.metadata.0.name
-    labels = {
-      app             = "istio"
-      context         = "v1"
-      owner           = "gds"
-      team            = "enable"
-      scope           = "platform"
-      department      = "global-digital"
-      istio-injection = "disabled"
-    }
+#   set {
+#     name  = "global.hub"
+#     value = "docker.io/istio"
+#   }
+
+#   set {
+#     name  = "global.tag"
+#     value = "1.8.2"
+#   }
+# depends_on = [ 
+#   kubernetes_namespace.istio_namespace,
+#    ]  
+# }
+resource "helm_release" "istio_operator" {
+  name       = "istio-operator"
+  chart      = "${path.module}/charts/istio-operator/"
+  version    = "1.0.0"  
+  # dependency_update = true
+
+  set {
+    name  = "hub"
+    value = "docker.io/istio"
   }
 
-  data = {
-    username   = "admin"
-    passphrase = "gdsadmin"
+  set {
+    name  = "tag"
+    value = "1.8.2"
+  }  
+  set {
+    name  = "operatorNamespace"
+    value = "istio-operator"
   }
-
-  type = "Opaque"
-
-  depends_on = [
-    var.aws_auth_config_map_id,
-  ]
+  # depends_on = [ helm_release.istio_base ]  
 }
-
-# Grafana kubernetes secret for basic authentication
-resource "kubernetes_secret" "grafana_secret" {
-  metadata {
-    name      = "grafana"
-    namespace = kubernetes_namespace.istio_namespace.metadata.0.name
-    labels = {
-      app             = "istio"
-      context         = "v1"
-      owner           = "gds"
-      team            = "enable"
-      scope           = "platform"
-      department      = "global-digital"
-      istio-injection = "disabled"
-    }
-  }
-
-  data = {
-    username   = "admin"
-    passphrase = "gdsadmin"
-  }
-
-  type = "Opaque"
-
-  depends_on = [
-    var.aws_auth_config_map_id,
-  ]
-}
-
-# Use Helm to install Istio Init
-resource "helm_release" "istio_init" {
-  name       = "istio-init"
-  repository = "https://storage.googleapis.com/istio-release/releases/1.4.3/charts/"
-  chart      = "istio-init"
-  version    = "1.4.3"
-  namespace  = kubernetes_namespace.istio_namespace.metadata.0.name
-
-  depends_on = [
-    kubernetes_namespace.istio_namespace,
-  ]
-}
-
-# Add a delay for Istio Init to fully complete and trigger the next helm_release
 resource "null_resource" "istio_delay" {
   provisioner "local-exec" {
     command = "sleep 60"
@@ -114,27 +148,29 @@ resource "null_resource" "istio_delay" {
     istio_service_name = "istio"
   }
   depends_on = [
-    helm_release.istio_init,
+    helm_release.istio_operator,
   ]
 }
-
-# Use Helm to install Istio
 resource "helm_release" "istio" {
-  name              = null_resource.istio_delay.triggers.istio_service_name
-  chart             = "istio"
-  version           = "1.4.3"
-  repository        = "https://storage.googleapis.com/istio-release/releases/1.4.3/charts/"
-  namespace         = kubernetes_namespace.istio_namespace.metadata.0.name
-  dependency_update = true
-  timeout           = 600
+  name       = null_resource.istio_delay.triggers.istio_service_name
+  chart      = "${path.module}/charts/istio/"
+  version    = "1.0.0"
+  # dependency_update = true
 
-  values = [
-    templatefile("${path.module}/config/istio.yaml", {})
-  ]
+  set {
+    name  = "hub"
+    value = "docker.io/istio"
+  }
 
-  depends_on = [
-    helm_release.istio_init,
-    null_resource.istio_delay,
-    kubernetes_namespace.istio_namespace,
-  ]
+  set {
+    name  = "tag"
+    value = "1.8.2"
+  }  
+  set {
+    name  = "operatorNamespace"
+    value = "istio-operator"
+  } 
+    depends_on = [ helm_release.istio_operator,
+     null_resource.istio_delay,
+           ]  
 }
