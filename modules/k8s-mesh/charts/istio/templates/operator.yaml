@@ -49,7 +49,7 @@ spec:
     # Istio Gateway feature
     ingressGateways:
     - name: istio-ingressgateway
-      enabled: true
+      enabled: false
       k8s:
         env:
           - name: ISTIO_META_ROUTER_MODE
@@ -102,7 +102,7 @@ spec:
 
     egressGateways:
     - name: istio-egressgateway
-      enabled: false
+      enabled: true
       k8s:
         env:
           - name: ISTIO_META_ROUTER_MODE
@@ -154,7 +154,7 @@ spec:
 
   addonComponents:
     istiocoredns:
-      enabled: true
+      enabled: false
 
 
   # Global values passed through to helm global.yaml.
@@ -163,7 +163,7 @@ spec:
     global:
       istioNamespace: istio-system
       istiod:
-        enableAnalysis: false
+        enableAnalysis: true
       logging:
         level: "default:info"
       logAsJson: false
