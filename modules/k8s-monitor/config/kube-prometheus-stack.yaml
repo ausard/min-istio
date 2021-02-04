@@ -93,54 +93,63 @@ prometheus:
         action: keep
         regex: external-secrets;external-secrets-kubernetes-external-secrets;prometheus
     #-----------Istio-----------it only for 1.4.3-----for version > 1.6. will be overriden ----
-    - job_name: 'istio-mesh'
+    - job_name: 'istio'
       scrape_interval: 5s
       kubernetes_sd_configs:
       - role: endpoints
       relabel_configs:
       - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
         action: keep
-        regex: istio-system;istio-telemetry;prometheus
-    - job_name: 'pilot'
-      scrape_interval: 5s
-      kubernetes_sd_configs:
-      - role: endpoints
-      relabel_configs:
-      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
-        action: keep
-        regex: istio-system;istio-pilot;http-monitoring
-    - job_name: 'mixer'
-      scrape_interval: 5s
-      kubernetes_sd_configs:
-      - role: endpoints
-      relabel_configs:
-      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
-        action: keep
-        regex: istio-system;istio-telemetry;http-monitoring
-    - job_name: 'galley'
-      scrape_interval: 5s
-      kubernetes_sd_configs:
-      - role: endpoints
-      relabel_configs:
-      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
-        action: keep
-        regex: istio-system;istio-galley;http-monitoring
-    - job_name: 'injector'
-      scrape_interval: 5s
-      kubernetes_sd_configs:
-      - role: endpoints
-      relabel_configs:
-      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
-        action: keep
-        regex: istio-system;istio-sidecar-injector;http-monitoring
-    - job_name: 'citadel'
-      scrape_interval: 5s
-      kubernetes_sd_configs:
-      - role: endpoints
-      relabel_configs:
-      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
-        action: keep
-        regex: istio-system;istio-citadel;http-monitoring
+        regex: istio-system;istiod;http-monitoring
+    #---------------old--------------------------------------------------------------------------
+    # - job_name: 'istio-mesh'
+    #   scrape_interval: 5s
+    #   kubernetes_sd_configs:
+    #   - role: endpoints
+    #   relabel_configs:
+    #   - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+    #     action: keep
+    #     regex: istio-system;istio-telemetry;prometheus
+    # - job_name: 'pilot'
+    #   scrape_interval: 5s
+    #   kubernetes_sd_configs:
+    #   - role: endpoints
+    #   relabel_configs:
+    #   - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+    #     action: keep
+    #     regex: istio-system;istio-pilot;http-monitoring
+    # - job_name: 'mixer'
+    #   scrape_interval: 5s
+    #   kubernetes_sd_configs:
+    #   - role: endpoints
+    #   relabel_configs:
+    #   - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+    #     action: keep
+    #     regex: istio-system;istio-telemetry;http-monitoring
+    # - job_name: 'galley'
+    #   scrape_interval: 5s
+    #   kubernetes_sd_configs:
+    #   - role: endpoints
+    #   relabel_configs:
+    #   - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+    #     action: keep
+    #     regex: istio-system;istio-galley;http-monitoring
+    # - job_name: 'injector'
+    #   scrape_interval: 5s
+    #   kubernetes_sd_configs:
+    #   - role: endpoints
+    #   relabel_configs:
+    #   - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+    #     action: keep
+    #     regex: istio-system;istio-sidecar-injector;http-monitoring
+    # - job_name: 'citadel'
+    #   scrape_interval: 5s
+    #   kubernetes_sd_configs:
+    #   - role: endpoints
+    #   relabel_configs:
+    #   - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+    #     action: keep
+    #     regex: istio-system;istio-citadel;http-monitoring
 #---------------------Grafana---------------------
 grafana:
   deploymentStrategy:
@@ -204,19 +213,19 @@ grafana:
     istio:
       istio-control-pane:
         gnetId: 7645
-        revision: 47
+        revision: 48
         datasource: Prometheus
       istio-workload:
         gnetId: 7630
-        revision: 47
+        revision: 48
         datasource: Prometheus
       istio-service:
         gnetId: 7636
-        revision: 47
+        revision: 48
         datasource: Prometheus
       istio-mesh:
         gnetId: 7639
-        revision: 47
+        revision: 48
         datasource: Prometheus
     jvm:     
       spring-boot-statistic:

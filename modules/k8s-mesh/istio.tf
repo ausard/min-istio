@@ -193,7 +193,7 @@ resource "kubernetes_namespace" "kiali_operator_namespace" {
 resource "helm_release" "kiali_operator" {
   name       = "kiali-operator"
   chart      = "kiali-operator"
-  # version    = "13.4.1"
+  version    = "1.29.0"
   repository = "https://kiali.org/helm-charts"
   namespace  =  kubernetes_namespace.kiali_operator_namespace.metadata.0.name
   dependency_update = true
@@ -213,7 +213,7 @@ resource "helm_release" "kiali_operator" {
     #   GRAFANA_REPLICA =  var.grafana_replica,
     #   GRAFANA_MAX_PDB = var.grafana_max_pdb,
     #   SPRING_DASHBOARD_LINK = "https://${aws_s3_bucket.grafana_dashboards.bucket_domain_name}/dashboards/spring-boot-statistics.json",
-    # }
+     }
     )
   ]
 }
