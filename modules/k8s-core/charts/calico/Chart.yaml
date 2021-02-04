@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+name: calico
+description: Global Digital Service Helm chart build for Calico
+maintainers:
+- name: Enable GDS
+  email: TS_Enable_GDS@bose.com
+type: application
+version: 1.0.1
+appVersion: 1.0.0

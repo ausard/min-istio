@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calico-typha
+  namespace: kube-system
+  labels:
+    k8s-app: calico-typha
+    {{ include "gds-calico-config.labels" . | nindent 4 }}
+spec:
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      k8s-app: calico-typha
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        k8s-app: calico-typha
+        {{ include "gds-calico-config.labels" . | nindent 8 }}
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+        cluster-autoscaler.kubernetes.io/safe-to-evict: 'true'
+    spec:
+      nodeSelector:
+        beta.kubernetes.io/os: linux
+        worker-class: private
+      tolerations:
+        # Mark the pod as a critical add-on for rescheduling.
+        - key: CriticalAddonsOnly
+          operator: Exists
+      hostNetwork: true
+      serviceAccountName: calico-node
+      containers:
+        - image: "{{ .Values.calico_typha_image.repository }}:{{ .Values.calico_typha_image.tag }}"
+          name: calico-typha
+          ports:
+            - containerPort: 5473
+              name: calico-typha
+              protocol: TCP
+          env:
+            # Use eni not cali for interface prefix
+            - name: FELIX_INTERFACEPREFIX
+              value: "eni"
+            - name: TYPHA_LOGFILEPATH
+              value: "none"
+            - name: TYPHA_LOGSEVERITYSYS
+              value: "none"
+            - name: TYPHA_LOGSEVERITYSCREEN
+              value: "info"
+            - name: TYPHA_PROMETHEUSMETRICSENABLED
+              value: "true"
+            - name: TYPHA_CONNECTIONREBALANCINGMODE
+              value: "kubernetes"
+            - name: TYPHA_PROMETHEUSMETRICSPORT
+              value: "9093"
+            - name: TYPHA_DATASTORETYPE
+              value: "kubernetes"
+            - name: TYPHA_MAXCONNECTIONSLOWERLIMIT
+              value: "1"
+            - name: TYPHA_HEALTHENABLED
+              value: "true"
+            # This will make Felix honor AWS VPC CNI's mangle table
+            # rules.
+            - name: FELIX_IPTABLESMANGLEALLOWACTION
+              value: Return
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 9098
+              host: localhost
+            periodSeconds: 30
+            initialDelaySeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 9098
+              host: localhost
+            periodSeconds: 10

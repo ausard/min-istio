@@ -1,0 +1,130 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: typha-cpha
+  labels:
+    {{ include "gds-calico-config.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: typha-cpha
+subjects:
+  - kind: ServiceAccount
+    name: typha-cpha
+    namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: typha-cpha
+  labels:
+    {{ include "gds-calico-config.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["list"]
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: calico-typha-horizontal-autoscaler
+  namespace: kube-system
+  labels:
+    {{ include "gds-calico-config.labels" . | nindent 4 }}
+data:
+  ladder: |-
+    {
+      "coresToReplicas": [],
+      "nodesToReplicas":
+      [
+        [1, 1],
+        [10, 2],
+        [100, 3],
+        [250, 4],
+        [500, 5],
+        [1000, 6],
+        [1500, 7],
+        [2000, 8]
+      ]
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calico-typha-horizontal-autoscaler
+  namespace: kube-system
+  labels:
+    k8s-app: calico-typha-autoscaler
+    {{ include "gds-calico-config.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      k8s-app: calico-typha-autoscaler
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        k8s-app: calico-typha-autoscaler
+        {{ include "gds-calico-config.labels" . | nindent 8 }}
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      nodeSelector:
+        beta.kubernetes.io/os: linux
+        worker-class: private
+      containers:
+        - image: "{{ .Values.cluster_proportional_autoscaler.repository }}:{{ .Values.cluster_proportional_autoscaler.tag }}"
+          name: autoscaler
+          command:
+            - /cluster-proportional-autoscaler
+            - --namespace=kube-system
+            - --configmap=calico-typha-horizontal-autoscaler
+            - --target=deployment/calico-typha
+            - --logtostderr=true
+            - --v=2
+          resources:
+            requests:
+              cpu: 10m
+            limits:
+              cpu: 10m
+      serviceAccountName: typha-cpha
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: typha-cpha
+  namespace: kube-system
+  labels:
+    {{ include "gds-calico-config.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get"]
+  - apiGroups: ["extensions"]
+    resources: ["deployments/scale"]
+    verbs: ["get", "update"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: typha-cpha
+  namespace: kube-system
+  labels:
+    {{ include "gds-calico-config.labels" . | nindent 4 }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: typha-cpha
+  namespace: kube-system
+  labels:
+    {{ include "gds-calico-config.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: typha-cpha
+subjects:
+  - kind: ServiceAccount
+    name: typha-cpha
+    namespace: kube-system

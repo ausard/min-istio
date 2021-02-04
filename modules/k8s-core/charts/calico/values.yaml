@@ -1,0 +1,14 @@
+nameOverride: ""
+fullnameOverride: ""
+
+calico_node_image:
+  repository: quay.io/calico/node
+  tag: v3.8.1
+
+calico_typha_image:
+  repository: quay.io/calico/typha
+  tag: v3.8.1
+
+cluster_proportional_autoscaler:
+  repository: k8s.gcr.io/cluster-proportional-autoscaler-amd64
+  tag: 1.1.2
