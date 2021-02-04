@@ -174,3 +174,46 @@ resource "helm_release" "istio" {
      null_resource.istio_delay,
            ]  
 }
+
+resource "kubernetes_namespace" "kiali_operator_namespace" {
+  metadata {
+    name     = "kiali-operator"
+
+    labels = {
+      app = "istio"
+      context = "v1"
+      owner = "gds"
+      team = "enable"
+      scope = "platform"
+      department = "global-digital"
+      istio-injection = "disabled"
+    }   
+}
+}
+resource "helm_release" "kiali_operator" {
+  name       = "kiali-operator"
+  chart      = "kiali-operator"
+  # version    = "13.4.1"
+  repository = "https://kiali.org/helm-charts"
+  namespace  =  kubernetes_namespace.kiali_operator_namespace.metadata.0.name
+  dependency_update = true
+  set {
+    name  = "cr.create"
+    value = "true"
+  }  
+  set{
+    name="cr.namespace"
+    value= "istio-system"
+  }
+
+  values = [
+    templatefile("${path.module}/config/kiali-operator.yaml", {
+    #   ADMIN_PWD = jsondecode(data.aws_secretsmanager_secret_version.grafana.secret_string)["adminPassword"],
+    #   ROOT_URL = "https://external.${local.gd_tf_workspace}.gds.bose.com/grafana",
+    #   GRAFANA_REPLICA =  var.grafana_replica,
+    #   GRAFANA_MAX_PDB = var.grafana_max_pdb,
+    #   SPRING_DASHBOARD_LINK = "https://${aws_s3_bucket.grafana_dashboards.bucket_domain_name}/dashboards/spring-boot-statistics.json",
+    # }
+    )
+  ]
+}

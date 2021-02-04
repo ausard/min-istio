@@ -111,19 +111,21 @@ spec:
           ports:
             - port: 80
               name: http2
-              targetPort: 8080
+              # targetPort: 8080
               protocol: TCP
             - port: 443
               name: https
-              targetPort: 8443
+              # targetPort: 8443
               protocol: TCP
             - port: 15443
-              targetPort: 15443
+              # targetPort: 15443
               name: tls
               protocol: TCP
+            - port: 3306
+              name: mysql
         hpaSpec:
           maxReplicas: 5
-          minReplicas: 1
+          minReplicas: 1 #2
           scaleTargetRef:
             apiVersion: apps/v1
             kind: Deployment
@@ -246,7 +248,7 @@ spec:
       validationURL: ""
     pilot:
       autoscaleEnabled: true
-      autoscaleMin: 1
+      autoscaleMin: 1 #2
       autoscaleMax: 5
       replicaCount: 1
       image: pilot
@@ -254,7 +256,13 @@ spec:
       env: {}
       cpu:
         targetAverageUtilization: 80
-      nodeSelector: {}
+      nodeSelector:
+        worker-class: private
+      # podAntiAffinityLabelSelector:
+      #   - key: istio
+      #     operator: In
+      #     values: pilot
+      #     topologyKey: kubernetes.io/hostname
       keepaliveMaxServerConnectionAge: 30m
       enableProtocolSniffingForOutbound: true
       enableProtocolSniffingForInbound: true
@@ -301,6 +309,14 @@ spec:
         name: istio-ingressgateway
         zvpn: {}
         env: {}
+        nodeSelector:
+          # worker-class: private-edge
+          worker-class: private
+        podAntiAffinityLabelSelector:
+          - key: istio
+            operator: In
+            values: egressgateway
+            topologyKey: kubernetes.io/hostname
         secretVolumes:
           - name: ingressgateway-certs
             secretName: istio-ingressgateway-certs
