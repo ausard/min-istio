@@ -5,6 +5,7 @@ metadata:
   labels:
     monitoring: istio-dataplane
     release: prometheus
+  namespace: istio-system
 spec:
   selector:
     matchExpressions:

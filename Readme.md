@@ -6,14 +6,16 @@
 + 4) Helm + Terraform + Kiali operator
 
 
-5) kube-prometheus-stack <---> Kiali 
-    5.1) istio ---> kps prometheus
++ 5) kube-prometheus-stack <---> Kiali 
+  +  5.1) istio ---> kps prometheus
 
-6) Settings Kiali <-> istio     https://istio.io/latest/docs/ops/integrations/kiali/
++ 6) Settings Kiali <-> istio     https://istio.io/latest/docs/ops/integrations/kiali/
 
-7) Settings Istio <-> kube-prometheus-stack (Grafana, Prometheus) ?ServiceMonitor for Istio?
++ 7) Settings Istio <-> kube-prometheus-stack (Grafana, Prometheus) ?ServiceMonitor for Istio?
                                 https://istio.io/latest/docs/ops/integrations/prometheus/
 
-8) new dashboards Istio to Grafana  https://istio.io/latest/docs/ops/integrations/grafana/
++ 8) new dashboards Istio to Grafana  https://istio.io/latest/docs/ops/integrations/grafana/
 
-9) Jaeger <-> istio ???         https://istio.io/latest/docs/ops/integrations/jaeger/
+9) Jaeger <-> istio <-> kiali ???         https://istio.io/latest/docs/ops/integrations/jaeger/
+
+10) monitoring Calico

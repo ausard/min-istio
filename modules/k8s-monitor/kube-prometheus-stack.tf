@@ -53,7 +53,7 @@ resource "helm_release" "kube_prometheus_stack" {
 
       ADMIN_PWD = "admin",
       ROOT_URL = "",
-      GRAFANA_REPLICA =  2,
+      GRAFANA_REPLICA =  1,
       GRAFANA_MAX_PDB = 1
       SPRING_DASHBOARD_LINK = "https://gds-dev-grafana.s3-eu-west-1.amazonaws.com/dashboards/spring-boot-statistics.json",
       SPRING_DASHBOARD = local.spring_dashboard,

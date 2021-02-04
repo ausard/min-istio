@@ -215,5 +215,51 @@ resource "helm_release" "kiali_operator" {
     #   SPRING_DASHBOARD_LINK = "https://${aws_s3_bucket.grafana_dashboards.bucket_domain_name}/dashboards/spring-boot-statistics.json",
      }
     )
+ 
   ]
 }
+
+resource "kubernetes_namespace" "jaeger_operator_namespace" {
+  metadata {
+    name     = "jaeger-operator"
+
+    labels = {
+      app = "istio"
+      context = "v1"
+      owner = "gds"
+      team = "enable"
+      scope = "platform"
+      department = "global-digital"
+      istio-injection = "disabled"
+    }   
+}
+}
+resource "helm_release" "jaeger_operator" {
+  name       = "jaeger-operator"
+  chart      = "jaeger-operator"
+  version    = "2.19.0"
+  repository = "https://jaegertracing.github.io/helm-charts"
+  namespace  =  kubernetes_namespace.jaeger_operator_namespace.metadata.0.name
+  dependency_update = true
+
+  set {
+    name  = "jaeger.create"
+    value = "true"
+  }  
+  set{
+    name="jaeger.namespace"
+    value= "istio-system"
+  }
+
+  values = [
+    templatefile("${path.module}/config/jaeger-operator.yaml", {
+    #   ADMIN_PWD = jsondecode(data.aws_secretsmanager_secret_version.grafana.secret_string)["adminPassword"],
+    #   ROOT_URL = "https://external.${local.gd_tf_workspace}.gds.bose.com/grafana",
+    #   GRAFANA_REPLICA =  var.grafana_replica,
+    #   GRAFANA_MAX_PDB = var.grafana_max_pdb,
+    #   SPRING_DASHBOARD_LINK = "https://${aws_s3_bucket.grafana_dashboards.bucket_domain_name}/dashboards/spring-boot-statistics.json",
+     }
+    )
+  ]
+}
+

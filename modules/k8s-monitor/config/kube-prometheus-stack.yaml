@@ -93,14 +93,14 @@ prometheus:
         action: keep
         regex: external-secrets;external-secrets-kubernetes-external-secrets;prometheus
     #-----------Istio-----------it only for 1.4.3-----for version > 1.6. will be overriden ----
-    - job_name: 'istio'
-      scrape_interval: 5s
-      kubernetes_sd_configs:
-      - role: endpoints
-      relabel_configs:
-      - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
-        action: keep
-        regex: istio-system;istiod;http-monitoring
+    # - job_name: 'istio'
+    #   scrape_interval: 5s
+    #   kubernetes_sd_configs:
+    #   - role: endpoints
+    #   relabel_configs:
+    #   - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
+    #     action: keep
+    #     regex: istio-system;istiod;http-monitoring
     #---------------old--------------------------------------------------------------------------
     # - job_name: 'istio-mesh'
     #   scrape_interval: 5s

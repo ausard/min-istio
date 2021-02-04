@@ -4,6 +4,7 @@ metadata:
   name: prometheus-oper-istio-controlplane
   labels:
     release: prometheus
+  namespace: istio-system
 spec:
   jobLabel: istio
   selector:
