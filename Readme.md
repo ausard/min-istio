@@ -1,4 +1,5 @@
 + 1) Terraform + istio operator - Done
+
 + 2) Kube-prometheus-stack - Done
     2.1) New Calico with Istio working 3.15.1
 + 3) Settings from old istio to new !!!! TODO: NEED TESTING IN OPS

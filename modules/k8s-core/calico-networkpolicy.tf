@@ -8,5 +8,5 @@ resource "helm_release" "calico" {
   namespace  = "kube-system"
   dependency_update = true
 
- 
+#  depends_on = [ module.k8-mesh.helm_release.istio ]
 }

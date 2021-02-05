@@ -119,6 +119,33 @@ resource "kubernetes_namespace" "istio_namespace" {
 #   kubernetes_namespace.istio_namespace,
 #    ]  
 # }
+# resource "kubernetes_namespace" "k8s_operators_namespace" {
+#   metadata {
+#     name     = "k8s-operators"
+
+#     labels = {
+#       app = "operators"
+#       context = "v1"
+#       owner = "gds"
+#       team = "enable"
+#       scope = "platform"
+#       department = "global-digital"
+#       istio-injection = "disabled"
+#     }
+
+#     # annotations = {
+#     #   "cattle.io/status" = "placeholder"
+#     #   "lifecycle.cattle.io/create.namespace-auth" = "placeholder"
+#     # }
+#   }
+
+#   # lifecycle {
+#   #   ignore_changes = [
+#   #     metadata[0].annotations["cattle.io/status"],
+#   #     metadata[0].annotations["lifecycle.cattle.io/create.namespace-auth"]
+#   #   ]
+#   # }
+# }
 resource "helm_release" "istio_operator" {
   name       = "istio-operator"
   chart      = "${path.module}/charts/istio-operator/"
@@ -136,13 +163,14 @@ resource "helm_release" "istio_operator" {
   }  
   set {
     name  = "operatorNamespace"
-    value = "istio-operator"
+    value = "k8s-operators"
   }
-  # depends_on = [ helm_release.istio_base ]  
+  depends_on = [ 
+  kubernetes_namespace.istio_namespace, ]  
 }
 resource "null_resource" "istio_delay" {
   provisioner "local-exec" {
-    command = "sleep 60"
+    command = "sleep 30"
   }
   triggers = {
     istio_service_name = "istio"
@@ -168,34 +196,19 @@ resource "helm_release" "istio" {
   }  
   set {
     name  = "operatorNamespace"
-    value = "istio-operator"
+    value = "k8s-operators"
   } 
     depends_on = [ helm_release.istio_operator,
      null_resource.istio_delay,
            ]  
 }
 
-resource "kubernetes_namespace" "kiali_operator_namespace" {
-  metadata {
-    name     = "kiali-operator"
-
-    labels = {
-      app = "istio"
-      context = "v1"
-      owner = "gds"
-      team = "enable"
-      scope = "platform"
-      department = "global-digital"
-      istio-injection = "disabled"
-    }   
-}
-}
 resource "helm_release" "kiali_operator" {
   name       = "kiali-operator"
   chart      = "kiali-operator"
   version    = "1.29.0"
   repository = "https://kiali.org/helm-charts"
-  namespace  =  kubernetes_namespace.kiali_operator_namespace.metadata.0.name
+  namespace  =  "k8s-operators"
   dependency_update = true
   set {
     name  = "cr.create"
@@ -217,29 +230,16 @@ resource "helm_release" "kiali_operator" {
     )
  
   ]
+  depends_on = [ helm_release.istio,
+   ]
 }
 
-resource "kubernetes_namespace" "jaeger_operator_namespace" {
-  metadata {
-    name     = "jaeger-operator"
-
-    labels = {
-      app = "istio"
-      context = "v1"
-      owner = "gds"
-      team = "enable"
-      scope = "platform"
-      department = "global-digital"
-      istio-injection = "disabled"
-    }   
-}
-}
 resource "helm_release" "jaeger_operator" {
   name       = "jaeger-operator"
   chart      = "jaeger-operator"
   version    = "2.19.0"
   repository = "https://jaegertracing.github.io/helm-charts"
-  namespace  =  kubernetes_namespace.jaeger_operator_namespace.metadata.0.name
+  namespace  =  "k8s-operators"
   dependency_update = true
 
   set {
@@ -261,5 +261,7 @@ resource "helm_release" "jaeger_operator" {
      }
     )
   ]
+  depends_on = [ helm_release.istio,
+   ]
 }
 

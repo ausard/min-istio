@@ -98,8 +98,8 @@ cr:
           components:
           - app_label: istiod
             is_core: true
-          - app_label: istio-ingressgateway
-            is_core: true
+          # - app_label: istio-ingressgateway
+          #   is_core: true
           - app_label: istio-egressgateway
             is_core: true
         config_map_name: "istio"
@@ -114,7 +114,7 @@ cr:
           is_core: true
         url: "http://kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090"
       tracing:
-        enabled: true
+        enabled: false
         component_status:
           app_label: "jaeger"
           is_core: true
