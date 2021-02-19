@@ -27,6 +27,7 @@ spec:
         # if it ever gets evicted.
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
+      priorityClassName: system-node-critical
       nodeSelector:
         beta.kubernetes.io/os: linux
       hostNetwork: true
@@ -78,6 +79,8 @@ spec:
               value: "none"
             - name: FELIX_PROMETHEUSMETRICSENABLED
               value: "true"
+            - name: FELIX_ROUTESOURCE
+              value: "WorkloadIPs"
             - name: NO_DEFAULT_POOLS
               value: "true"
             # Set based on the k8s node name.
@@ -93,10 +96,10 @@ spec:
           securityContext:
             privileged: true
           livenessProbe:
-            httpGet:
-              path: /liveness
-              port: 9099
-              host: localhost
+            exec:
+              command:
+              - /bin/calico-node
+              - -felix-live
             periodSeconds: 10
             initialDelaySeconds: 10
             failureThreshold: 6

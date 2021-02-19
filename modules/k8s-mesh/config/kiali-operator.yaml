@@ -1,5 +1,6 @@
 # Deployment options for the operator pod.
-nodeSelector: {}
+# nodeSelector:
+#   worker-class: private
 podAnnotations: {}
 env: []
 tolerations: []
@@ -41,65 +42,32 @@ cr:
   # and the operator is watching all namespaces (--set watchNamespace="")
   # then this is the namespace where the CR will be created (the default will be the operator namespace).
   namespace: ""
-
   spec:
-    # version: v1.29.0
     istio_namespace: istio-system
     istio_component_namespaces:
       prometheus: kube-prometheus-stack
       grafana: kube-prometheus-stack
       tracing: kube-prometheus-stack
-    api:
-      namespaces:
-        exclude:
-        - "istio-operator"
-        - "kube.*"
-        - "kiali-operator"
-        - "argocd"
-        - "cert-manager"
-        - "flux"
-        - "harbor"
-        - "openebs"
-        - "permission-manager"
     auth:
-      strategy: "token"
+      strategy: "anonymous"
     deployment:
+      # node_selector:
+      #   worker-class: private
+      replicas: 2
       accessible_namespaces: ["**"]
       namespace: istio-system
       ingress_enabled: false
     server:
-      web_fqdn: kiali.kube.example.com
+      web_fqdn: ""
     external_services:
       grafana:
-        enabled: false
-        auth:
-          password: admin
-          type: basic
-          use_kiali_token: false
-          username: admin
-        component_status:
-          app_label: "grafana"
-          is_core: true
-          namespace: "kube-prometheus-stack"
-        dashboards:
-          - name: "Istio Service Dashboard"
-            variables:
-              namespace: "var-namespace"
-              service: "var-service"
-          - name: "Istio Workload Dashboard"
-            variables:
-              namespace: "var-namespace"
-              workload: "var-workload"
-        in_cluster_url: "http://kube-prometheus-stack-grafana.kube-prometheus-stack.svc.cluster.local:3000"
-        url: "https://grafana.kube.example.com"
+        enabled: false        
       istio:
         component_status:
           enabled: true
           components:
           - app_label: istiod
             is_core: true
-          # - app_label: istio-ingressgateway
-          #   is_core: true
           - app_label: istio-egressgateway
             is_core: true
         config_map_name: "istio"
@@ -115,11 +83,3 @@ cr:
         url: "http://kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local:9090"
       tracing:
         enabled: false
-        component_status:
-          app_label: "jaeger"
-          is_core: true
-          namespace: "istio-system"
-        in_cluster_url: "http://jaeger-tracer-query.istio-system"
-        namespace_selector: true
-        url: "https://jaeger.kube.example.com"
-        whitelist_istio_system: ["istio-egressgateway", "istio-ingressgateway"]

@@ -1,6 +1,0 @@
-jaeger:
-  spec:    
-    allInOne:
-      image: jaegertracing/all-in-one:latest
-    agent:
-      image: jaegertracing/jaeger-agent:latest

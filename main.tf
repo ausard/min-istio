@@ -11,12 +11,7 @@ provider "helm" {
 }
 
 terraform {
-  required_providers {
-    helm = {
-      source = "hashicorp/helm"
-      version = "2.0.2"
-    }
-  }
+  
 }
 # The module k8s-mesh creates service mesh resources
 module "k8s-mesh" {
@@ -26,7 +21,4 @@ module "k8s-mesh" {
 module "k8s-monitor" {
   source = "./modules/k8s-monitor"
   aws_auth_config_map_id = "Hello" # Dependency on aws_auth configmap
-}
-module "k8s-core" {
-  source = "./modules/k8s-core" 
 }

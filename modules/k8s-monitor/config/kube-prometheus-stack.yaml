@@ -83,6 +83,25 @@ prometheus:
       - source_labels: [ __meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name ]
         action: keep
         regex: ambassador;ambassador-external-admin;ambassador-admin
+    #--------------calico----------------
+    - job_name: felix_metrics
+      scrape_interval: 5s
+      scheme: http
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        regex: kube-system;felix-metrics-svc;monitor
+        action: keep
+    - job_name: typha_metrics
+      scrape_interval: 5s
+      scheme: http
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        regex: kube-system;typha-metrics-svc;monitor
+        action: keep
     #--------external-secrets------------
     - job_name: external-secrets
       scrape_interval: 15s
@@ -192,7 +211,11 @@ grafana:
           path: /var/lib/grafana/dashboards/k8s
  
   dashboards: 
-    default:      
+    default:
+      calico:
+        gnetId: 12175
+        revision: 5
+        datasource: Prometheus        
       ambassador-dasboard:
         gnetId: 10850
         revision: 2
