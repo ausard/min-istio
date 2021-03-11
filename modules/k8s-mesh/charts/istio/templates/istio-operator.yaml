@@ -10,8 +10,8 @@ spec:
 
   meshConfig:
     accessLogFile: /dev/stdout
-    outboundTrafficPolicy:
-      mode: REGISTRY_ONLY
+    # outboundTrafficPolicy:
+    #   mode: REGISTRY_ONLY
     defaultConfig:
       proxyMetadata: {}
     enableAutoMtls: false
@@ -109,7 +109,7 @@ spec:
     global:
       istioNamespace: istio-system
       proxy:
-        image: istio-proxyv2
+        image: proxyv2
         resources:
           requests:
             cpu: 100m
@@ -120,7 +120,7 @@ spec:
         logLevel: info
         privileged: true
       proxy_init:
-        image: istio-proxyv2
+        image: proxyv2
         resources:
           limits:
             cpu: 500m
@@ -130,10 +130,10 @@ spec:
             memory: 10Mi
 
     pilot:
-      image: istio-pilot
+      image: pilot
 
     sidecarInjectorWebhook:
-      enableNamespacesByDefault: true
+      enableNamespacesByDefault: false
       objectSelector:
         enabled: false
 

@@ -1,0 +1,173 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": "-- Grafana --",
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "description": "Applications Status",
+    "editable": true,
+    "gnetId": null,
+    "graphTooltip": 0,
+    "id": 46,
+    "links": [],
+    "panels": [
+      {
+        "colors": [
+          "#299c46",
+          "rgba(237, 129, 40, 0.89)",
+          "#d44a3a",
+          "#4040a0"
+        ],
+        "datasource": "Prometheus",
+        "fieldConfig": {
+          "defaults": {
+            "custom": {}
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 23,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
+        "id": 2,
+        "mappingType": 2,
+        "mappingTypes": [
+          {
+            "name": "value to text",
+            "value": 1
+          },
+          {
+            "name": "range to text",
+            "value": 2
+          }
+        ],
+        "pluginVersion": "7.3.5",
+        "polystat": {
+          "animationSpeed": 2500,
+          "columnAutoSize": true,
+          "columns": "",
+          "defaultClickThrough": "",
+          "defaultClickThroughNewTab": false,
+          "defaultClickThroughSanitize": false,
+          "displayLimit": 50,
+          "fontAutoColor": true,
+          "fontAutoScale": false,
+          "fontColor": "",
+          "fontSize": 11,
+          "fontType": "Roboto",
+          "globalDecimals": null,
+          "globalDisplayMode": "all",
+          "globalDisplayTextTriggeredEmpty": "OK",
+          "globalOperatorName": "max",
+          "globalThresholds": [
+            {
+              "color": "#d44a3a",
+              "state": 2,
+              "value": 0
+            },
+            {
+              "color": "rgba(237, 129, 40, 0.89)",
+              "state": 1,
+              "value": 0.5
+            },
+            {
+              "color": "#299c46",
+              "state": 0,
+              "value": 1
+            }
+          ],
+          "globalUnitFormat": "percentunit",
+          "gradientEnabled": true,
+          "hexagonSortByDirection": 1,
+          "hexagonSortByField": "name",
+          "maxMetrics": 0,
+          "polygonBorderColor": "black",
+          "polygonBorderSize": 2,
+          "polygonGlobalFillColor": "#0a50a1",
+          "radius": "",
+          "radiusAutoSize": true,
+          "rowAutoSize": false,
+          "rows": 3,
+          "shape": "hexagon_pointed_top",
+          "tooltipDisplayMode": "all",
+          "tooltipDisplayTextTriggeredEmpty": "OK",
+          "tooltipFontSize": 12,
+          "tooltipFontType": "Roboto",
+          "tooltipPrimarySortDirection": 2,
+          "tooltipPrimarySortField": "name",
+          "tooltipSecondarySortDirection": 2,
+          "tooltipSecondarySortField": "value",
+          "tooltipTimestampEnabled": false,
+          "valueEnabled": true
+        },
+        "rangeMaps": [
+          {
+            "from": "0",
+            "text": "Not Ready",
+            "to": ".49"
+          },
+          {
+            "from": ".49",
+            "text": "Warning",
+            "to": ".99"
+          },
+          {
+            "from": "1",
+            "text": "Ready",
+            "to": "1"
+          }
+        ],
+        "savedComposites": [],
+        "savedOverrides": [],
+        "targets": [
+          {
+            "expr": "(kube_deployment_status_replicas_available{namespace=~\".*-te-.*|.*-v1\"}/kube_deployment_status_replicas{namespace=~\".*te.*|.*-v1\"}) ",
+            "format": "time_series",
+            "hide": false,
+            "instant": false,
+            "interval": "",
+            "intervalFactor": 1,
+            "legendFormat": "{{ namespace }}",
+            "refId": "A"
+          }
+        ],
+        "timeFrom": null,
+        "timeShift": null,
+        "title": "Applications status",
+        "type": "grafana-polystat-panel",
+        "valueMaps": [
+          {
+            "op": "=",
+            "text": "N/A",
+            "value": "null"
+          }
+        ]
+      }
+    ],
+    "refresh": "5s",
+    "schemaVersion": 26,
+    "style": "dark",
+    "tags": [],
+    "templating": {
+      "list": []
+    },
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Applications Status",
+    "uid": "JRJ-EZ8Gz",
+    "version": 15
+  }

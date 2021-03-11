@@ -4,7 +4,7 @@
 # Kube-prometheus-stack namespace with Istio injection disabled so no sidecars are created for pods in this namespace
 resource "kubernetes_namespace" "kube_prometheus_stack_namespace" {
   metadata {
-    name     = "kube-prometheus-stack"
+    name     = "monitoring"
 
     labels = {
       app = "kube-prometheus-stack"
@@ -35,9 +35,9 @@ resource "kubernetes_namespace" "kube_prometheus_stack_namespace" {
 
 # Helm release Kube-prometheus-stack
 resource "helm_release" "kube_prometheus_stack" {
-  name       = "kube-prometheus-stack"
+  name       = "monitoring"
   chart      = "kube-prometheus-stack"
-  version    = "13.4.1"
+  version    = "14.0.0"
   repository = "https://prometheus-community.github.io/helm-charts/"
   namespace  = kubernetes_namespace.kube_prometheus_stack_namespace.metadata.0.name
   dependency_update = true
