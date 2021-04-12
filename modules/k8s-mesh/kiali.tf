@@ -34,7 +34,7 @@ resource "kubernetes_namespace" "kiali_operator_namespace" {
 resource "helm_release" "kiali_operator" {
   name       = "kiali-operator"
   chart      = "kiali-operator"
-  version    = "1.30.0"
+  version    = "1.32.0"
   repository = "https://kiali.org/helm-charts"
   namespace  = kubernetes_namespace.kiali_operator_namespace.metadata[0].name
 

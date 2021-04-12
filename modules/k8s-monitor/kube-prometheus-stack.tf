@@ -37,7 +37,7 @@ resource "kubernetes_namespace" "kube_prometheus_stack_namespace" {
 resource "helm_release" "kube_prometheus_stack" {
   name       = "monitoring"
   chart      = "kube-prometheus-stack"
-  version    = "14.0.0"
+  version    = "14.6.0"
   repository = "https://prometheus-community.github.io/helm-charts/"
   namespace  = kubernetes_namespace.kube_prometheus_stack_namespace.metadata.0.name
   dependency_update = true

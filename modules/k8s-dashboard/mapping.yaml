@@ -1,0 +1,26 @@
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: kubernetes-dashboard-admin
+  namespace: kubernetes-dashboard
+spec:
+  ambassador_id:
+  - ambassador-internal
+  prefix: /dashboard-admin/
+  service: kubernetes-dashboard.kubernetes-dashboard-temp:80
+
+--- 
+
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: kubernetes-dashboard-readonly
+  namespace: kubernetes-dashboard
+spec:
+  add_request_headers:
+    Authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkNGNUpSSnlYbE1GQzdjX2VpaTAwSWcyWVVBZFBjclZmZkJEcDV0MmhnTE0ifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlcm5ldGVzLWRhc2hib2FyZC10ZW1wIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6Imt1YmVybmV0ZXMtZGFzaGJvYXJkLXJlYWRvbmx5LXRva2VuLXBoOWhuIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6Imt1YmVybmV0ZXMtZGFzaGJvYXJkLXJlYWRvbmx5Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiNTE5OWQ2YzUtNmYyOS00MWVkLWI2OWItNmZkOGEyYzVkOTAwIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50Omt1YmVybmV0ZXMtZGFzaGJvYXJkLXRlbXA6a3ViZXJuZXRlcy1kYXNoYm9hcmQtcmVhZG9ubHkifQ.drgqVTtf5p4_iTsoNdpRQ6lKXOBv8SEMY4UW800TTJSkjugJ2mjvmwlvNJ2IztciSzkKIN0987xgJx6_yEgfNi6xY_AnfTB6V86Un7osKBou5sWK2ajG4Nu2ZpDCsUYX9OPpqMOTSBLh4axi9SDuOBTG6Z3jyHfxzZdnoX6GdWif635twY_JmTViROzmMqBmeGqt7uqiKl5ZmIrYgM-c-PAddJTdV_Ky5PgdrzTSKBG39AxDKoiotxdVDRxNMR3wOMZKHDW9tx6_qw8Or8rjWgeSgFwFtovZuEVDo8mYBaev3dzzrDuUBzsWWc-NoXD71-gRVDMxKPuv1iVhaq9cnw
+  ambassador_id:
+  - ambassador-internal
+  prefix: /dashboard/
+  service: kubernetes-dashboard.kubernetes-dashboard-temp:80
+
