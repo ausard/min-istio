@@ -20,6 +20,9 @@ module "k8s-mesh" {
 module "k8s-monitor" {
   source = "./modules/k8s-monitor"
   aws_auth_config_map_id = "Hello" # Dependency on aws_auth configmap
+  kubernetes_dashboard_service_name = module.k8s-dashboard.kubernetes_dashboard_service_name
+  kubernetes_dashboard_service_namespace = module.k8s-dashboard.kubernetes_dashboard_service_namespace
+  kubernetes_dashboard_view_only_token = module.k8s-dashboard.kubernetes_dashboard_view_only_token
 }
 module "k8s-core" {
   source = "./modules/k8s-core"

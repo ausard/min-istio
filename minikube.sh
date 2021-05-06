@@ -13,5 +13,5 @@ kubectl label node minikube worker-class=private
 # kubectl label ns kub-blog istio-injected=disabled
 minikube ip
 helm repo update
-sh terraform init
+terraform init
 terraform apply -auto-approve

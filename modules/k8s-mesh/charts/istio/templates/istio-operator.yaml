@@ -133,7 +133,7 @@ spec:
       image: pilot
 
     sidecarInjectorWebhook:
-      enableNamespacesByDefault: false
+      enableNamespacesByDefault: true
       objectSelector:
         enabled: false
 

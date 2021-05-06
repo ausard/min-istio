@@ -59,7 +59,7 @@ resource "helm_release" "istio_operator" {
   }
   set {
     name  = "tag"
-    value = "1.9.0"
+    value = "1.8.2"
   }
   set {
     name  = "operatorNamespace"
@@ -83,7 +83,7 @@ resource "helm_release" "istio" {
   }
   set {
     name  = "tag"
-    value = "1.9.0"
+    value = "1.8.2"
   }
   set {
     name  = "operatorNamespace"

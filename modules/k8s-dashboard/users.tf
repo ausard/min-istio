@@ -1,7 +1,7 @@
-resource "kubernetes_cluster_role" "viewonly" {
+resource "kubernetes_cluster_role" "kubernetes_dashboard_readonly" {
   metadata {
-    name = "kubernetes-dashboard-viewonly"
-    labels = local.kubernetes_resources_labels
+    name = "kubernetes-dashboard-readonly"
+    labels = local.kubernetes_dashboard_resources_labels
   }
 
   rule {
@@ -71,29 +71,28 @@ resource "kubernetes_cluster_role" "viewonly" {
   }
 }
 
-resource "kubernetes_cluster_role_binding" "viewonly" {
-  metadata {
-    name = "kubernetes-dashboard-viewonly"
-  }
-
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.viewonly.metadata.0.name
-  }
-  subject {
-    kind      = "ServiceAccount"
-    name      = kubernetes_service_account.kubernetes_dashboard_viewonly.metadata.0.name
-    namespace = var.kubernetes_namespace
-  }
-}
-
 resource "kubernetes_service_account" "kubernetes_dashboard_viewonly" {
   depends_on = [kubernetes_namespace.kubernetes_dashboard]
   metadata {
     name = "kubernetes-dashboard-viewonly"
-    namespace = var.kubernetes_namespace
-    labels = local.kubernetes_resources_labels
+    namespace = var.kubernetes_dashboard_namespace
+    labels = local.kubernetes_dashboard_resources_labels
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "kubernetes_dashboard_readonly" {
+  metadata {
+    name = "kubernetes-dashboard-readonly"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.kubernetes_dashboard_readonly.metadata.0.name
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.kubernetes_dashboard_viewonly.metadata.0.name
+    namespace = var.kubernetes_dashboard_namespace
   }
 }
 
@@ -101,16 +100,15 @@ resource "kubernetes_service_account" "kubernetes_dashboard_admin" {
   depends_on = [kubernetes_namespace.kubernetes_dashboard]
   metadata {
     name = "kubernetes-dashboard-admin"
-    namespace = var.kubernetes_namespace
-    labels = local.kubernetes_resources_labels
+    namespace = var.kubernetes_dashboard_namespace
+    labels = local.kubernetes_dashboard_resources_labels
   }
 }
 
-resource "kubernetes_cluster_role_binding" "admin" {
+resource "kubernetes_cluster_role_binding" "kubernetes_dashboard_admin" {
   metadata {
     name = "kubernetes-dashboard-admin"
   }
-
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
@@ -119,6 +117,6 @@ resource "kubernetes_cluster_role_binding" "admin" {
   subject {
     kind      = "ServiceAccount"
     name      = kubernetes_service_account.kubernetes_dashboard_admin.metadata.0.name
-    namespace = var.kubernetes_namespace
+    namespace = var.kubernetes_dashboard_namespace
   }
 }

@@ -12,22 +12,8 @@ resource "kubernetes_namespace" "kube_prometheus_stack_namespace" {
       team = "enable"
       scope = "platform"
       context = "v1"
-      istio-injection = "disabled"
-    }
-
-    annotations = {
-      "cattle.io/status" = "placeholder"
-      "lifecycle.cattle.io/create.namespace-auth" = "placeholder"
     }
   }
-
-  lifecycle {
-    ignore_changes = [
-      metadata[0].annotations["cattle.io/status"],
-      metadata[0].annotations["lifecycle.cattle.io/create.namespace-auth"]
-    ]
-  }
-
   depends_on = [
     var.aws_auth_config_map_id,
   ]
@@ -37,7 +23,7 @@ resource "kubernetes_namespace" "kube_prometheus_stack_namespace" {
 resource "helm_release" "kube_prometheus_stack" {
   name       = "monitoring"
   chart      = "kube-prometheus-stack"
-  version    = "14.6.0"
+  version    = "15.4.4"
   repository = "https://prometheus-community.github.io/helm-charts/"
   namespace  = kubernetes_namespace.kube_prometheus_stack_namespace.metadata.0.name
   dependency_update = true
